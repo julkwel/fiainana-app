@@ -21,7 +21,7 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   void navigationPage() {
-    Navigator.of(context).pushReplacementNamed(HOME_SCREEN);
+    Navigator.of(context).pushReplacementNamed(LOGIN_FORM);
   }
 
   @override
@@ -29,7 +29,7 @@ class SplashScreenState extends State<SplashScreen>
     super.initState();
     animationController = new AnimationController(
       vsync: this,
-      duration: new Duration(seconds: 2),
+      duration: new Duration(seconds: 3),
     );
     animation =
         new CurvedAnimation(parent: animationController, curve: Curves.easeOut);
@@ -56,7 +56,7 @@ class SplashScreenState extends State<SplashScreen>
               Padding(
                 padding: EdgeInsets.only(bottom: 30.0),
                 child: new Image.asset(
-                  'assets/images/powered_by.png',
+                  'assets/images/fiainana.jpeg',
                   height: 25.0,
                   fit: BoxFit.scaleDown,
                 ),
@@ -67,7 +67,7 @@ class SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               new Image.asset(
-                'assets/images/logo.png',
+                'assets/images/fiainana.jpeg',
                 width: animation.value * 250,
                 height: animation.value * 250,
               ),

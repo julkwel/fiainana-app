@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gridview_app/constant/Constant.dart';
-import 'package:flutter_gridview_app/screen/GridItemDetails.dart';
+import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:flutter_gridview_app/screen/HomeScreen.dart';
 import 'package:flutter_gridview_app/screen/SplashScreen.dart';
 
 void main() => runApp(MaterialApp(
-      title: 'GridView Demo',
+      title: 'Fiainana BDB',
       home: SplashScreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -15,6 +15,7 @@ void main() => runApp(MaterialApp(
       routes: <String, WidgetBuilder>{
         SPLASH_SCREEN: (BuildContext context) => SplashScreen(),
         HOME_SCREEN: (BuildContext context) => HomeScreen(),
+        LOGIN_FORM: (BuildContext context) => Register()
         //GRID_ITEM_DETAILS_SCREEN: (BuildContext context) => GridItemDetails(),
       },
     ));

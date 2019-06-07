@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gridview_app/model/Item.dart';
 import 'package:flutter_gridview_app/screen/GetRatings.dart';
-import 'package:flutter_gridview_app/screen/GridItemDetails.dart';
 
 class ItemList extends StatelessWidget {
   final Item item;
@@ -12,12 +11,14 @@ class ItemList extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        /** 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => GridItemDetails(this.item),
           ),
         );
+        */
       },
       child: Card(
         elevation: 1.0,
@@ -44,10 +45,11 @@ class ItemList extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: TextStyle(
-                      fontSize: 12.0,
+                      fontSize: 25.0,
                       color: Color(0xFFD73C29),
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   Text(
                     item.category,
@@ -56,60 +58,16 @@ class ItemList extends StatelessWidget {
                       fontSize: 9.0,
                     ),
                   ),
+                  Text(
+                    item.desc,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 9.0,
+                    ),
+                  ),
                   SizedBox(height: 0.0),
                   GetRatings(),
                   SizedBox(height: 2.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(right: 4.0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              'RELEASE DATE:',
-                              style: TextStyle(
-                                color: Colors.black38,
-                                fontSize: 9.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              item.releaseDate,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 9.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 4.0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              'RUNTIME:',
-                              style: TextStyle(
-                                color: Colors.black38,
-                                fontSize: 9.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              item.runtime,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 9.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -153,76 +111,11 @@ class HeaderContent extends StatelessWidget {
                       fontSize: 9.0,
                     ),
                   ),
-                  GetRatings(),
-                  MovieDesc(this.item),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class MovieDesc extends StatelessWidget {
-  final Item item;
-
-  MovieDesc(this.item);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            child: Column(
-              children: <Widget>[
-                Text(
-                  'RELEASE DATE:',
-                  style: TextStyle(
-                    color: Colors.black38,
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  item.releaseDate,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10.0, right: 10.0),
-            child: Column(
-              children: <Widget>[
-                Text(
-                  'RUNTIME:',
-                  style: TextStyle(
-                    color: Colors.black38,
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  item.runtime,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
