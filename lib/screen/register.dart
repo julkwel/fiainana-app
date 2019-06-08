@@ -46,7 +46,12 @@ class RegisterFormState extends State<RegisterForm> {
         children: <Widget>[
           new ListTile(
             leading: const Icon(Icons.person),
-            title: new TextField(
+            title: new TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter your name';
+                }
+              },
               decoration: new InputDecoration(
                 hintText: "Name",
               ),
@@ -54,7 +59,12 @@ class RegisterFormState extends State<RegisterForm> {
           ),
           new ListTile(
             leading: const Icon(Icons.phone),
-            title: new TextField(
+            title: new TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter your phone number';
+                }
+              },
               decoration: new InputDecoration(
                 hintText: "Phone",
               ),
@@ -62,9 +72,27 @@ class RegisterFormState extends State<RegisterForm> {
           ),
           new ListTile(
             leading: const Icon(Icons.email),
-            title: new TextField(
+            title: new TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Entrer votre email';
+                }
+              },
               decoration: new InputDecoration(
                 hintText: "Email",
+              ),
+            ),
+          ),
+          new ListTile(
+            leading: const Icon(Icons.lock),
+            title: new TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Entrer votre mots de passe';
+                }
+              },
+              decoration: new InputDecoration(
+                hintText: "Password",
               ),
             ),
           ),
@@ -86,7 +114,7 @@ class RegisterFormState extends State<RegisterForm> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
+                      builder: (context) => HomeScreen(post: FetchPost(),),
                     ),
                   );
                   //Scaffold.of(context)
