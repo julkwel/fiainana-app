@@ -37,6 +37,7 @@ class _MyCustomFormState extends State<Register> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Fiainana BDB'),
+        backgroundColor: Colors.red,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -49,6 +50,7 @@ class _MyCustomFormState extends State<Register> {
       floatingActionButton: FloatingActionButton(
         // When the user presses the button, show an alert dialog with the
         // text the user has typed into our text field.
+        backgroundColor: Colors.red,
         onPressed: () {
           _save(myController.text);
           showDialog(

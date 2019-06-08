@@ -75,7 +75,6 @@ class HomePageState extends State<HomePage> {
 
 class HomeScreen extends StatelessWidget {
   final String title;
-
   HomeScreen({Key key, this.title}) : super(key: key);
 
   @override
@@ -90,7 +89,7 @@ class HomeScreen extends StatelessWidget {
               child:
                   Text('Fiainana BDB', style: TextStyle(color: Colors.white)),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.red,
               ),
             ),
             ListTile(
