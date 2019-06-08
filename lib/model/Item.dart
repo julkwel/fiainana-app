@@ -1,35 +1,17 @@
-import 'package:meta/meta.dart';
+class Photo {
+  final int id;
+  final String title;
+  final String description;
+  final String image;
 
-class Item {
-  int id;
-  String name;
-  String category;
-  String releaseDate;
-  String releaseDateDesc;
-  String directors;
-  String runtime;
-  String desc;
-  double rating;
-  String imageUrl;
-  String bannerUrl;
-  String trailerImg1;
-  String trailerImg2;
-  String trailerImg3;
+  Photo({this.id, this.title, this.description, this.image});
 
-  Item({
-    @required this.id,
-    @required this.name,
-    @required this.category,
-    @required this.directors,
-    @required this.releaseDate,
-    @required this.releaseDateDesc,
-    @required this.runtime,
-    @required this.desc,
-    @required this.rating,
-    @required this.imageUrl,
-    @required this.bannerUrl,
-    @required this.trailerImg1,
-    @required this.trailerImg2,
-    @required this.trailerImg3,
-  });
+  factory Photo.fromJson(Map<String, dynamic> json) {
+    return Photo(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      image: json['image'] as String,
+    );
+  }
 }

@@ -3,12 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gridview_app/model/Item.dart';
 import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  final response = await client.get('http://192.168.1.101:8000/teny/teny/api/');
+  final response = await client.get('http://192.168.1.103:8000/teny/api/');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
@@ -19,24 +20,6 @@ List<Photo> parsePhotos(String responseBody) {
   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
 
   return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
-}
-
-class Photo {
-  final int id;
-  final String title;
-  final String description;
-  final String image;
-
-  Photo({this.id, this.title, this.description, this.image});
-
-  factory Photo.fromJson(Map<String, dynamic> json) {
-    return Photo(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      image: json['image'] as String,
-    );
-  }
 }
 
 class HomePage extends StatefulWidget {
@@ -145,14 +128,14 @@ class PhotosList extends StatefulWidget {
 
 class PhotosListState extends State<PhotosList> {
   final List<Photo> photos;
-  var username = "Amie";
+  var username = "Amis";
   PhotosListState(this.photos);
 
   Future getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'username';
     final value = prefs.getString(key) ?? 'Amie';
-    print('user name ' +  value);
+    print('user name ' + value);
     if (value != null) {
       setState(() {
         username = value;
@@ -175,10 +158,59 @@ class PhotosListState extends State<PhotosList> {
         ),
         itemCount: photos.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(photos[index].title),
-            subtitle: Text(
-                photos[index].description.replaceAll(r'Hello', '$username')),
+          return Card(
+            elevation: 1.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 18.0 / 12.0,
+                  child: Image.network(
+                    //photos[index].image ?? '',
+                    'https://ict.io/wp-content/uploads/2017/11/techno-madagascar.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                new Padding(
+                  padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        photos[index].title,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 25.0,
+                          color: Color(0xFFD73C29),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        photos[index].description,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 9.0,
+                        ),
+                      ),
+                      Text(
+                        photos[index].description,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 9.0,
+                        ),
+                      ),
+                      SizedBox(height: 0.0),
+                      SizedBox(height: 2.0),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
