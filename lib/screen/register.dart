@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gridview_app/constant/Constant.dart';
+import 'package:flutter_gridview_app/screen/HomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -50,21 +51,14 @@ class _MyCustomFormState extends State<Register> {
       floatingActionButton: FloatingActionButton(
         // When the user presses the button, show an alert dialog with the
         // text the user has typed into our text field.
-        backgroundColor: Colors.red,
         onPressed: () {
           _save(myController.text);
-          showDialog(
-            context: context,
-            builder: (context) {
-              AlertDialog(
-                content: Text('Bienvenue $myController.text'),
-              );
-            },
+          return Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context) => HomePage()),
           );
-
-          return Navigator.of(context).pushReplacementNamed(HOME_SCREEN);
         },
-        tooltip: 'Username!',
+        tooltip: 'Show me the value!',
         child: Icon(Icons.text_fields),
       ),
     );

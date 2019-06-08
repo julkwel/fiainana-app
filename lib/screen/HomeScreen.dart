@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  final response = await client.get('http://192.168.1.103:8000/teny/api/');
+  final response = await client.get('https://www.techzara.org/garage/teny/api/');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
@@ -34,8 +34,8 @@ class HomePageState extends State<HomePage> {
   Future getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'username';
-    final user = prefs.getString(key) ?? 0;
-    if (user) {
+    final user = prefs.getString(key) ?? 'Amis';
+    if (user != null) {
       setState(() {
         appTitle = user;
       });
@@ -135,10 +135,10 @@ class PhotosListState extends State<PhotosList> {
     final prefs = await SharedPreferences.getInstance();
     final key = 'username';
     final value = prefs.getString(key) ?? 'Amie';
-    print('user name ' + value);
+
     if (value != null) {
       setState(() {
-        username = value;
+        username = value ?? '';
       });
     }
   }
@@ -168,9 +168,9 @@ class PhotosListState extends State<PhotosList> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18.0 / 12.0,
-                  child: Image.network(
-                    //photos[index].image ?? '',
-                    'https://ict.io/wp-content/uploads/2017/11/techno-madagascar.jpg',
+                  child: FadeInImage.assetNetwork(
+                    placeholder: 'assets/images/DoubleBounce.gif',
+                    image: 'https://techzara.org/garage/uploads/assets/'+photos[index].image,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -180,7 +180,7 @@ class PhotosListState extends State<PhotosList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        photos[index].title,
+                        photos[index].title ?? '',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
@@ -191,20 +191,12 @@ class PhotosListState extends State<PhotosList> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        photos[index].description,
+                        photos[index].description.replaceAll(r'namana', '$username') ?? '',
                         style: TextStyle(
                           color: Colors.black54,
                           fontSize: 9.0,
                         ),
                       ),
-                      Text(
-                        photos[index].description,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 9.0,
-                        ),
-                      ),
-                      SizedBox(height: 0.0),
                       SizedBox(height: 2.0),
                     ],
                   ),

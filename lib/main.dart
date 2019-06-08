@@ -14,7 +14,7 @@ void main() => runApp(MaterialApp(
       ),
       routes: <String, WidgetBuilder>{
         SPLASH_SCREEN: (BuildContext context) => SplashScreen(),
-        HOME_SCREEN: (BuildContext context) => new HomePage(),
+        HOME_SCREEN: (BuildContext context) => HomePage(),
         LOGIN_FORM: (BuildContext context) => Register()
         //GRID_ITEM_DETAILS_SCREEN: (BuildContext context) => GridItemDetails(),
       },
