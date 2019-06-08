@@ -1,65 +1,108 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_gridview_app/model/Item.dart';
-import 'package:flutter_gridview_app/screen/ItemList.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-Future<Post> FetchPost() async {
-  final response =
-      await http.get('https://jsonplaceholder.typicode.com/posts/1');
-  if (response.statusCode == 200) {
-    return Post.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load post');
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gridview_app/screen/register.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<List<Photo>> fetchPhotos(http.Client client) async {
+  final response = await client.get('http://192.168.1.101:8000/teny/teny/api/');
+
+  // Use the compute function to run parsePhotos in a separate isolate
+  return compute(parsePhotos, response.body);
+}
+
+// A function that converts a response body into a List<Photo>
+List<Photo> parsePhotos(String responseBody) {
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+}
+
+class Photo {
+  final int id;
+  final String title;
+  final String description;
+  final String image;
+
+  Photo({this.id, this.title, this.description, this.image});
+
+  factory Photo.fromJson(Map<String, dynamic> json) {
+    return Photo(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      image: json['image'] as String,
+    );
   }
 }
 
-class Post {
-  final int userId;
-  final int id;
-  final String title;
-  final String body;
+class HomePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return new HomePageState();
+  }
+}
 
-  Post({this.id, this.userId, this.title, this.body});
+class HomePageState extends State<HomePage> {
+  var appTitle = 'FIAINANA BDB';
+  Future getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'username';
+    final user = prefs.getString(key) ?? 0;
+    if (user) {
+      setState(() {
+        appTitle = user;
+      });
+    }
+  }
 
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-        userId: json['userId'],
-        id: json['id'],
-        title: json['title'],
-        body: json['body']);
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: HomeScreen(title: appTitle),
+    );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  List<Post> itemList;
-  final Future<Post> post;
-  HomeScreen({Key key, this.post}) : super(key: key);
+  final String title;
+
+  HomeScreen({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    itemList = _itemList();
-
     return Scaffold(
-      // sidebar menu
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Fiainana be dia be',
-                  style: TextStyle(color: Colors.white)),
+              child:
+                  Text('Fiainana BDB', style: TextStyle(color: Colors.white)),
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
             ),
             ListTile(
-              title: Text('Momba ahy', style: TextStyle(color: Colors.blue)),
+              title:
+                  Text('Hanova anarana', style: TextStyle(color: Colors.blue)),
               onTap: () {
-                print("hahaha");
-                print(post);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Register(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -74,50 +117,72 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // App
       appBar: AppBar(
-        title: Text('Fiainana be dia be'),
-        centerTitle: true,
+        title: Text(title),
+        backgroundColor: Colors.red,
       ),
-      body: _gridView(),
+      body: FutureBuilder<List<Photo>>(
+        future: fetchPhotos(http.Client()),
+        builder: (context, snapshot) {
+          print(snapshot);
+          if (snapshot.hasError) print(snapshot.error);
+          return snapshot.hasData
+              ? new PhotosList(photos: snapshot.data)
+              : Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
+}
 
-  Widget _gridView() {
-    return GridView.count(
-      crossAxisCount: 1,
-      padding: EdgeInsets.all(4.0),
-      childAspectRatio: 8.0 / 9.0,
-      children: <Widget>[
-        FutureBuilder<Post>(
-          future: post,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data.title);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
+class PhotosList extends StatefulWidget {
+  final List<Photo> photos;
+  PhotosList({Key key, this.photos}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() {
+    return new PhotosListState(photos);
+  }
+}
 
-            // By default, show a loading spinner
-            return CircularProgressIndicator();
-          },
+class PhotosListState extends State<PhotosList> {
+  final List<Photo> photos;
+  var username = "Amie";
+  PhotosListState(this.photos);
+
+  Future getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'username';
+    final value = prefs.getString(key) ?? 'Amie';
+    print('user name ' +  value);
+    if (value != null) {
+      setState(() {
+        username = value;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
         ),
-      ],
-    );
-  }
-
-  List<Post> _itemList() {
-    return [
-      Post(
-        id: 0,
-        userId: 2,
-        title: 'Hello Jul',
-        body: '17 Ho mandrakizay ny anarany; raha mbola maharitra koa ny masoandro, dia hanorobona ny anarany; ary izy ho fitahiana ny olona; ny firenena rehetra hanao azy ho sambatra.'
-            '18 Isaorana anie Jehovah Andriamanitra, Andriamanitry ny Isiraely; Izy irery ihany no manao fahagagana;'
-            '19 Ary isaorana mandrakizay anie ny anarany malaza; ary aoka ny tany rehetra ho henika ny voninahiny. Amena dia Amena.'
-            '20 Tapitra ny fivavak’ i Davida, zanak’ i Jese.',
+        itemCount: photos.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(photos[index].title),
+            subtitle: Text(
+                photos[index].description.replaceAll(r'Hello', '$username')),
+          );
+        },
       ),
-    
-    ];
+    );
   }
 }

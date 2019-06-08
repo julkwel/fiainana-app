@@ -1,131 +1,85 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'HomeScreen.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gridview_app/constant/Constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
+  @override
+  _MyCustomFormState createState() => _MyCustomFormState();
+}
+
+// Define a corresponding State class. This class will hold the data related to
+// our Form.
+class _MyCustomFormState extends State<Register> {
+  // Create a text controller. We will use it to retrieve the current value
+  // of the TextField!
+  final myController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _read());
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the Widget is disposed
+    myController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final appTitle = 'Entrer votre information';
-
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(appTitle),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Fiainana BDB'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          decoration: InputDecoration(
+              border: InputBorder.none, hintText: 'Ampidiro ny anaranao'),
+          controller: myController,
         ),
-        body: RegisterForm(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        // When the user presses the button, show an alert dialog with the
+        // text the user has typed into our text field.
+        onPressed: () {
+          _save(myController.text);
+          showDialog(
+            context: context,
+            builder: (context) {
+              AlertDialog(
+                content: Text('Bienvenue $myController.text'),
+              );
+            },
+          );
+
+          return Navigator.of(context).pushReplacementNamed(HOME_SCREEN);
+        },
+        tooltip: 'Username!',
+        child: Icon(Icons.text_fields),
       ),
     );
   }
 }
 
-// Create a Form Widget
-class RegisterForm extends StatefulWidget {
-  @override
-  RegisterFormState createState() {
-    return RegisterFormState();
-  }
+_save(name) async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'username';
+  final value = name;
+  prefs.setString(key, value);
+  print('saved: $value');
 }
 
-// Create a corresponding State class. This class will hold the data related to
-// the form.
-class RegisterFormState extends State<RegisterForm> {
-  // Create a global key that will uniquely identify the Form widget and allow
-  // us to validate the form
-  //
-  // Note: This is a GlobalKey<FormState>, not a GlobalKey<RegisterFormState>!
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey we created above
-    new Container();
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new ListTile(
-            leading: const Icon(Icons.person),
-            title: new TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter your name';
-                }
-              },
-              decoration: new InputDecoration(
-                hintText: "Name",
-              ),
-            ),
-          ),
-          new ListTile(
-            leading: const Icon(Icons.phone),
-            title: new TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter your phone number';
-                }
-              },
-              decoration: new InputDecoration(
-                hintText: "Phone",
-              ),
-            ),
-          ),
-          new ListTile(
-            leading: const Icon(Icons.email),
-            title: new TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Entrer votre email';
-                }
-              },
-              decoration: new InputDecoration(
-                hintText: "Email",
-              ),
-            ),
-          ),
-          new ListTile(
-            leading: const Icon(Icons.lock),
-            title: new TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Entrer votre mots de passe';
-                }
-              },
-              decoration: new InputDecoration(
-                hintText: "Password",
-              ),
-            ),
-          ),
-          const Divider(
-            height: 1.0,
-          ),
-          Center(
-            child: new MaterialButton(
-              height: 40.0,
-              minWidth: 300.0,
-              padding: const EdgeInsets.all(10.0),
-              textColor: Colors.white,
-              color: Colors.blue,
-              onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
-                if (_formKey.currentState.validate()) {
-                  // If the form is valid, we want to show a Snackbar
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreen(post: FetchPost(),),
-                    ),
-                  );
-                  //Scaffold.of(context)
-                  //  .showSnackBar(SnackBar(content: Text('Processing Data')));
-                }
-              },
-              child: Text('Enregistrer'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+_read() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'username';
+  final value = prefs.getString(key) ?? 0;
+  print('read: $value');
 }
