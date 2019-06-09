@@ -67,18 +67,14 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
+        elevation: 1.0,
         child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              child:
-                  Text('Fiainana BDB', style: TextStyle(color: Colors.white)),
-              decoration: BoxDecoration(
-                color: Colors.red,
-              ),
-            ),
+            _buildHeaderDrawer(),
             ListTile(
+              leading: Icon(Icons.add),
               title:
                   Text('Hanova anarana', style: TextStyle(color: Colors.blue)),
               onTap: () {
@@ -91,6 +87,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: Icon(Icons.book),
               title: Text(
                 'Tenin\'Andriamanitra anio',
                 style: TextStyle(color: Colors.blue),
@@ -118,6 +115,18 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildHeaderDrawer() {
+  return new DrawerHeader(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      image: DecorationImage(
+        image: AssetImage('assets/images/fiainana.png'),
+        fit: BoxFit.fill,
+      ),
+    ), child: null,
+  );
 }
 
 class PhotosList extends StatefulWidget {
@@ -169,9 +178,8 @@ class PhotosListState extends State<PhotosList> {
                 await launch('https://techzara.org/garage/teny/api/' + '$id');
               }
             },
-            
             child: Card(
-              elevation: 1.0,
+              elevation: 2.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
@@ -183,7 +191,8 @@ class PhotosListState extends State<PhotosList> {
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/images/DoubleBounce.gif',
                       image: 'https://techzara.org/garage/uploads/assets/' +
-                          photos[index].image ?? 'https://i0.wp.com/www.michellewuesthoff.com/wp-content/uploads/2018/11/sasha-stories-320885-unsplash.jpg?resize=1080%2C675',
+                              photos[index].image ??
+                          'https://i0.wp.com/www.michellewuesthoff.com/wp-content/uploads/2018/11/sasha-stories-320885-unsplash.jpg?resize=1080%2C675',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -192,8 +201,19 @@ class PhotosListState extends State<PhotosList> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        SizedBox(height: 2.0),
                         Text(
-                          photos[index].title.replaceAll(r'prenom', '$username') ?? '',
+                          photos[index].dateajout ?? '',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 8.0,
+                          ),
+                        ),
+                        Text(
+                          photos[index]
+                                  .title
+                                  .replaceAll(r'prenom', '$username') ??
+                              '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(
