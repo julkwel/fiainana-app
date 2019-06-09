@@ -10,7 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  final response = await client.get('https://www.techzara.org/garage/teny/api/');
+  final response =
+      await client.get('https://www.techzara.org/garage/teny/api/');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
@@ -54,7 +55,6 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomeScreen(title: appTitle),
-      
     );
   }
 }
@@ -164,55 +164,63 @@ class PhotosListState extends State<PhotosList> {
           return InkWell(
             onTap: () async {
               var id = photos[index].id;
-              if (await canLaunch('https://techzara.org/garage/teny/api/'+'$id')) {
-                await launch('https://techzara.org/garage/teny/api/'+'$id');
+              if (await canLaunch(
+                  'https://techzara.org/garage/teny/api/' + '$id')) {
+                await launch('https://techzara.org/garage/teny/api/' + '$id');
               }
             },
+            
             child: Card(
               elevation: 1.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 18.0 / 12.0,
-                  child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/DoubleBounce.gif',
-                    image: 'https://techzara.org/garage/uploads/assets/'+photos[index].image,
-                    fit: BoxFit.cover,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 18.0 / 12.0,
+                    child: FadeInImage.assetNetwork(
+                      placeholder: 'assets/images/DoubleBounce.gif',
+                      image: 'https://techzara.org/garage/uploads/assets/' +
+                          photos[index].image ?? 'https://i0.wp.com/www.michellewuesthoff.com/wp-content/uploads/2018/11/sasha-stories-320885-unsplash.jpg?resize=1080%2C675',
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                new Padding(
-                  padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        photos[index].title ?? '',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          color: Color(0xFFD73C29),
-                          fontWeight: FontWeight.bold,
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          photos[index].title.replaceAll(r'namana', '$username') ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            color: Color(0xFFD73C29),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        photos[index].description.replaceAll(r'namana', '$username') ?? '',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 9.0,
+                        Text(
+                          photos[index]
+                                  .description
+                                  .replaceAll(r'namana', '$username') ??
+                              '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 8,
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 9.0,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 2.0),
-                    ],
+                        SizedBox(height: 2.0),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             ),
           );
         },

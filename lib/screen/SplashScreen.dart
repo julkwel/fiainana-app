@@ -24,9 +24,9 @@ class SplashScreenState extends State<SplashScreen>
   void navigationPage() async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'username';
-    final value = prefs.getString(key) ?? 0;
+    final value = prefs.getString(key) ?? '';
     print('read: $value');
-    if (value != null) {
+    if (value != '') {
       Navigator.of(context).pushReplacementNamed(HOME_SCREEN);
     } else {
       Navigator.of(context).pushReplacementNamed(LOGIN_FORM);
