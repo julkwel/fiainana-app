@@ -193,7 +193,7 @@ class PhotosListState extends State<PhotosList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          photos[index].title.replaceAll(r'namana', '$username') ?? '',
+                          photos[index].title.replaceAll(r'prenom', '$username') ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(
@@ -206,7 +206,7 @@ class PhotosListState extends State<PhotosList> {
                         Text(
                           photos[index]
                                   .description
-                                  .replaceAll(r'namana', '$username') ??
+                                  .replaceAll(r'prenom', '$username') ??
                               '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 8,

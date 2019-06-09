@@ -58,8 +58,8 @@ class _MyCustomFormState extends State<Register> {
               builder: (context) => HomePage()),
           );
         },
-        tooltip: 'Show me the value!',
-        child: Icon(Icons.text_fields),
+        tooltip: 'Enregistrer',
+        child: Icon(Icons.check),
       ),
     );
   }

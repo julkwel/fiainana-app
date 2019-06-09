@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: ^0.4.3
   path_provider: ^0.4.1
   url_launcher: ^3.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -42,6 +43,7 @@ flutter:
   #  - images/a_dot_ham.jpeg
 
   assets:
+        - assets/images/fiainana.png
         - assets/images/fiainana.jpeg
         - assets/images/audio.svg
         - assets/images/DoubleBounce.gif
