@@ -1,65 +1,93 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_gridview_app/model/Item.dart';
-import 'package:flutter_gridview_app/screen/ItemList.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-Future<Post> FetchPost() async {
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gridview_app/model/Item.dart';
+import 'package:flutter_gridview_app/screen/register.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+Future<List<Photo>> fetchPhotos(http.Client client) async {
   final response =
-      await http.get('https://jsonplaceholder.typicode.com/posts/1');
-  if (response.statusCode == 200) {
-    return Post.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load post');
+      await client.get('https://www.techzara.org/garage/teny/api/');
+
+  // Use the compute function to run parsePhotos in a separate isolate
+  return compute(parsePhotos, response.body);
+}
+
+// A function that converts a response body into a List<Photo>
+List<Photo> parsePhotos(String responseBody) {
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return new HomePageState();
   }
 }
 
-class Post {
-  final int userId;
-  final int id;
-  final String title;
-  final String body;
+class HomePageState extends State<HomePage> {
+  var appTitle = 'FIAINANA BDB';
+  /**
+  Future getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'username';
+    final user = prefs.getString(key) ?? 'Amis';
+    if (user != null) {
+      setState(() {
+        appTitle = 'Fiainana BDB hoan\'i ' + user;
+      });
+    }
+  }
 
-  Post({this.id, this.userId, this.title, this.body});
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  } **/
 
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-        userId: json['userId'],
-        id: json['id'],
-        title: json['title'],
-        body: json['body']);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: HomeScreen(title: appTitle),
+    );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  List<Post> itemList;
-  final Future<Post> post;
-  HomeScreen({Key key, this.post}) : super(key: key);
+  final String title;
+  HomeScreen({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    itemList = _itemList();
-
     return Scaffold(
-      // sidebar menu
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Fiainana be dia be',
-                  style: TextStyle(color: Colors.white)),
+              child:
+                  Text('Fiainana BDB', style: TextStyle(color: Colors.white)),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.red,
               ),
             ),
             ListTile(
-              title: Text('Momba ahy', style: TextStyle(color: Colors.blue)),
+              title:
+                  Text('Hanova anarana', style: TextStyle(color: Colors.blue)),
               onTap: () {
-                print("hahaha");
-                print(post);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Register(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -74,50 +102,129 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // App
       appBar: AppBar(
-        title: Text('Fiainana be dia be'),
-        centerTitle: true,
+        title: Text(title),
+        backgroundColor: Colors.red,
       ),
-      body: _gridView(),
+      body: FutureBuilder<List<Photo>>(
+        future: fetchPhotos(http.Client()),
+        builder: (context, snapshot) {
+          print(snapshot);
+          if (snapshot.hasError) print(snapshot.error);
+          return snapshot.hasData
+              ? new PhotosList(photos: snapshot.data)
+              : Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
+}
 
-  Widget _gridView() {
-    return GridView.count(
-      crossAxisCount: 1,
-      padding: EdgeInsets.all(4.0),
-      childAspectRatio: 8.0 / 9.0,
-      children: <Widget>[
-        FutureBuilder<Post>(
-          future: post,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data.title);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
+class PhotosList extends StatefulWidget {
+  final List<Photo> photos;
+  PhotosList({Key key, this.photos}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() {
+    return new PhotosListState(photos);
+  }
+}
 
-            // By default, show a loading spinner
-            return CircularProgressIndicator();
-          },
+class PhotosListState extends State<PhotosList> {
+  final List<Photo> photos;
+  var username = "Amis";
+  PhotosListState(this.photos);
+
+  Future getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'username';
+    final value = prefs.getString(key) ?? 'Amie';
+
+    if (value != null) {
+      setState(() {
+        username = value ?? '';
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
         ),
-      ],
-    );
-  }
-
-  List<Post> _itemList() {
-    return [
-      Post(
-        id: 0,
-        userId: 2,
-        title: 'Hello Jul',
-        body: '17 Ho mandrakizay ny anarany; raha mbola maharitra koa ny masoandro, dia hanorobona ny anarany; ary izy ho fitahiana ny olona; ny firenena rehetra hanao azy ho sambatra.'
-            '18 Isaorana anie Jehovah Andriamanitra, Andriamanitry ny Isiraely; Izy irery ihany no manao fahagagana;'
-            '19 Ary isaorana mandrakizay anie ny anarany malaza; ary aoka ny tany rehetra ho henika ny voninahiny. Amena dia Amena.'
-            '20 Tapitra ny fivavak’ i Davida, zanak’ i Jese.',
+        itemCount: photos.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () async {
+              var id = photos[index].id;
+              if (await canLaunch(
+                  'https://techzara.org/garage/teny/api/' + '$id')) {
+                await launch('https://techzara.org/garage/teny/api/' + '$id');
+              }
+            },
+            
+            child: Card(
+              elevation: 1.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 18.0 / 12.0,
+                    child: FadeInImage.assetNetwork(
+                      placeholder: 'assets/images/DoubleBounce.gif',
+                      image: 'https://techzara.org/garage/uploads/assets/' +
+                          photos[index].image ?? 'https://i0.wp.com/www.michellewuesthoff.com/wp-content/uploads/2018/11/sasha-stories-320885-unsplash.jpg?resize=1080%2C675',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          photos[index].title.replaceAll(r'namana', '$username') ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            color: Color(0xFFD73C29),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          photos[index]
+                                  .description
+                                  .replaceAll(r'namana', '$username') ??
+                              '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 8,
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 9.0,
+                          ),
+                        ),
+                        SizedBox(height: 2.0),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
-    
-    ];
+    );
   }
 }

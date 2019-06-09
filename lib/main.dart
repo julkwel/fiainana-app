@@ -5,7 +5,7 @@ import 'package:flutter_gridview_app/screen/HomeScreen.dart';
 import 'package:flutter_gridview_app/screen/SplashScreen.dart';
 
 void main() => runApp(MaterialApp(
-      title: 'Fiainana BDB',
+      title: 'FIAINANA BDB',
       home: SplashScreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -14,7 +14,7 @@ void main() => runApp(MaterialApp(
       ),
       routes: <String, WidgetBuilder>{
         SPLASH_SCREEN: (BuildContext context) => SplashScreen(),
-        HOME_SCREEN: (BuildContext context) => HomeScreen(),
+        HOME_SCREEN: (BuildContext context) => HomePage(),
         LOGIN_FORM: (BuildContext context) => Register()
         //GRID_ITEM_DETAILS_SCREEN: (BuildContext context) => GridItemDetails(),
       },
