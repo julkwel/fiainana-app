@@ -7,6 +7,7 @@ import 'package:flutter_gridview_app/model/Item.dart';
 import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
   final response = await client.get('https://www.techzara.org/garage/teny/api/');
@@ -31,13 +32,14 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   var appTitle = 'FIAINANA BDB';
+  /**
   Future getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'username';
     final user = prefs.getString(key) ?? 'Amis';
     if (user != null) {
       setState(() {
-        appTitle = user;
+        appTitle = 'Fiainana BDB hoan\'i ' + user;
       });
     }
   }
@@ -46,12 +48,13 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getUser();
-  }
+  } **/
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomeScreen(title: appTitle),
+      
     );
   }
 }
@@ -158,8 +161,15 @@ class PhotosListState extends State<PhotosList> {
         ),
         itemCount: photos.length,
         itemBuilder: (context, index) {
-          return Card(
-            elevation: 1.0,
+          return InkWell(
+            onTap: () async {
+              var id = photos[index].id;
+              if (await canLaunch('https://techzara.org/garage/teny/api/'+'$id')) {
+                await launch('https://techzara.org/garage/teny/api/'+'$id');
+              }
+            },
+            child: Card(
+              elevation: 1.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -202,6 +212,7 @@ class PhotosListState extends State<PhotosList> {
                   ),
                 ),
               ],
+            ),
             ),
           );
         },

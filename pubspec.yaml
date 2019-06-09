@@ -19,7 +19,7 @@ dependencies:
   http:
   shared_preferences: ^0.4.3
   path_provider: ^0.4.1
-
+  url_launcher: ^3.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -45,6 +45,7 @@ flutter:
         - assets/images/fiainana.jpeg
         - assets/images/audio.svg
         - assets/images/DoubleBounce.gif
+        - assets/images/god.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
