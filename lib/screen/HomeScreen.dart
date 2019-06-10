@@ -74,7 +74,10 @@ class HomeScreen extends StatelessWidget {
           children: <Widget>[
             _buildHeaderDrawer(),
             ListTile(
-              leading: Icon(Icons.add),
+              leading: new IconTheme(
+                data: new IconThemeData(color: Colors.blueAccent),
+                child: new Icon(Icons.settings),
+              ),
               title:
                   Text('Hanova anarana', style: TextStyle(color: Colors.blue)),
               onTap: () {
@@ -87,7 +90,10 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.book),
+              leading: new IconTheme(
+                data: new IconThemeData(color: Colors.redAccent),
+                child: new Icon(Icons.book),
+              ),
               title: Text(
                 'Tenin\'Andriamanitra anio',
                 style: TextStyle(color: Colors.blue),
@@ -103,18 +109,21 @@ class HomeScreen extends StatelessWidget {
         title: Text(title),
         backgroundColor: Colors.red,
       ),
-      body: FutureBuilder<List<Photo>>(
-        future: fetchPhotos(http.Client()),
-        builder: (context, snapshot) {
-          print(snapshot);
-          if (snapshot.hasError) print(snapshot.error);
-          return snapshot.hasData
-              ? new PhotosList(photos: snapshot.data)
-              : Center(child: CircularProgressIndicator());
-        },
-      ),
+      body: _handlerefresh(),
     );
   }
+}
+
+Widget _handlerefresh() {
+  return FutureBuilder<List<Photo>>(
+    future: fetchPhotos(http.Client()),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) print(snapshot.error);
+      return snapshot.hasData
+          ? new PhotosList(photos: snapshot.data)
+          : Center(child: CircularProgressIndicator());
+    },
+  );
 }
 
 Widget _buildHeaderDrawer() {
@@ -122,10 +131,11 @@ Widget _buildHeaderDrawer() {
     decoration: BoxDecoration(
       color: Colors.white,
       image: DecorationImage(
-        image: AssetImage('assets/images/fiainana.png'),
-        fit: BoxFit.fill,
+        image: AssetImage('assets/images/logof.png'),
+        fit: BoxFit.fitWidth,
       ),
-    ), child: null,
+    ),
+    child: null,
   );
 }
 
@@ -139,7 +149,7 @@ class PhotosList extends StatefulWidget {
 }
 
 class PhotosListState extends State<PhotosList> {
-  final List<Photo> photos;
+  List<Photo> photos;
   var username = "Amis";
   PhotosListState(this.photos);
 
@@ -161,89 +171,100 @@ class PhotosListState extends State<PhotosList> {
     getUser();
   }
 
+  Future<List<Photo>> _onRefresh() {
+    return fetchPhotos(http.Client()).then((_user) {
+      setState(() => photos = _user);
+    });
+  }
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _onRefresh,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 1,
+          ),
+          itemCount: photos.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () async {
+                var id = photos[index].id;
+                if (await canLaunch(
+                    'https://techzara.org/garage/teny/api/' + '$id')) {
+                  await launch('https://techzara.org/garage/teny/api/' + '$id');
+                }
+              },
+              child: Card(
+                elevation: 2.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    AspectRatio(
+                      aspectRatio: 18.0 / 12.0,
+                      child: FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/DoubleBounce.gif',
+                          image: photos[index].image ?? '',
+                          fit: BoxFit.fitWidth),
+                    ),
+                    new Padding(
+                      padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 2.0),
+                          Text(
+                            photos[index].dateajout ?? '',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 8.0,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            photos[index]
+                                    .title
+                                    .replaceAll(r'mon amis', '$username') ??
+                                '',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              color: Color(0xFFD73C29),
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            photos[index]
+                                    .description
+                                    .replaceAll(r'mon amis', '$username') ??
+                                '',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 8,
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 9.0,
+                            ),
+                          ),
+                          SizedBox(height: 2.0),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
-        itemCount: photos.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () async {
-              var id = photos[index].id;
-              if (await canLaunch(
-                  'https://techzara.org/garage/teny/api/' + '$id')) {
-                await launch('https://techzara.org/garage/teny/api/' + '$id');
-              }
-            },
-            child: Card(
-              elevation: 2.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 18.0 / 12.0,
-                    child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/images/DoubleBounce.gif',
-                      image: 'https://techzara.org/garage/uploads/assets/' +
-                              photos[index].image ??
-                          'https://i0.wp.com/www.michellewuesthoff.com/wp-content/uploads/2018/11/sasha-stories-320885-unsplash.jpg?resize=1080%2C675',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(height: 2.0),
-                        Text(
-                          photos[index].dateajout ?? '',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 8.0,
-                          ),
-                        ),
-                        Text(
-                          photos[index]
-                                  .title
-                                  .replaceAll(r'prenom', '$username') ??
-                              '',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 25.0,
-                            color: Color(0xFFD73C29),
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          photos[index]
-                                  .description
-                                  .replaceAll(r'prenom', '$username') ??
-                              '',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 8,
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 9.0,
-                          ),
-                        ),
-                        SizedBox(height: 2.0),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
