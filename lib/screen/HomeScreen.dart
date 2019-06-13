@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gridview_app/model/Item.dart';
+import 'package:flutter_gridview_app/screen/GridItemDetails.dart';
 import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  final response =
-      await client.get('https://www.techzara.org/garage/teny/api/');
+  final response = await client.get('http://192.168.1.100:8000/teny/api/');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
@@ -186,86 +186,60 @@ class PhotosListState extends State<PhotosList> {
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _onRefresh,
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-          ),
-          itemCount: photos.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () async {
-                var id = photos[index].id;
-                if (await canLaunch(
-                    'https://techzara.org/garage/teny/api/' + '$id')) {
-                  await launch('https://techzara.org/garage/teny/api/' + '$id');
-                }
-              },
-              child: Card(
-                elevation: 2.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: 18.0 / 12.0,
-                      child: FadeInImage.assetNetwork(
-                          placeholder: 'assets/images/DoubleBounce.gif',
-                          image: photos[index].image ?? '',
-                          fit: BoxFit.fitWidth),
-                    ),
-                    new Padding(
-                      padding: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 2.0),
-                          Text(
-                            photos[index].dateajout ?? '',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 8.0,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            photos[index]
-                                    .title
-                                    .replaceAll(r'mon amis', '$username') ??
-                                '',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              color: Color(0xFFD73C29),
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            photos[index]
-                                    .description
-                                    .replaceAll(r'mon amis', '$username') ??
-                                '',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 8,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 9.0,
-                            ),
-                          ),
-                          SizedBox(height: 2.0),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+        child: _gridView(),
       ),
     );
+  }
+
+  Widget _gridView() {
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              return _buildListItem(photos[index]);
+            },
+            childCount: photos.length,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildListItem(photos) {
+    var text = photos.description.replaceAll(new RegExp(r'zanako*'), username);
+    return Container(
+        height: 120,
+        child: Card(
+            elevation: 2.0,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GridItemDetails(photos)),
+                );
+              },
+              child: Center(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(photos.image),
+                  ),
+                  title: Text(
+                    photos.title,
+                    softWrap: true,
+                  ),
+                  subtitle: Text(
+                    text.replaceAll(new RegExp('\\*'), ' '),
+                    maxLines: 5,
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+              ),
+            )));
   }
 }
