@@ -8,10 +8,9 @@ import 'package:flutter_gridview_app/screen/GridItemDetails.dart';
 import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  final response = await client.get('http://192.168.1.100:8000/teny/api/');
+  final response = await client.get('https://www.fiainanabediabe.org/teny/api/');
 
   // Use the compute function to run parsePhotos in a separate isolate
   return compute(parsePhotos, response.body);
@@ -207,9 +206,9 @@ class PhotosListState extends State<PhotosList> {
   }
 
   Widget _buildListItem(photos) {
-    var text = photos.description.replaceAll(new RegExp(r'zanako*'), username);
+    var text = photos.description.replaceAll(new RegExp(r'zanaku'), username);
     return Container(
-        height: 120,
+        height: 100,
         child: Card(
             elevation: 2.0,
             child: InkWell(
@@ -217,7 +216,7 @@ class PhotosListState extends State<PhotosList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => GridItemDetails(photos)),
+                      builder: (context) => GridItemDetails(photos,username)),
                 );
               },
               child: Center(
@@ -227,16 +226,17 @@ class PhotosListState extends State<PhotosList> {
                     backgroundImage: NetworkImage(photos.image),
                   ),
                   title: Text(
-                    photos.title,
+                    photos.title.replaceAll(new RegExp(r'zanaku'), username),
                     softWrap: true,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue
+                    ),
                   ),
                   subtitle: Text(
                     text.replaceAll(new RegExp('\\*'), ' '),
-                    maxLines: 5,
-                    style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                    maxLines: 2,
+                    style: Theme.of(context).textTheme.body1,
                   ),
                 ),
               ),

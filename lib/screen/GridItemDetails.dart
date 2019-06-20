@@ -1,9 +1,12 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_gridview_app/model/Item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class GridItemDetails extends StatelessWidget {
   final Photo item;
-  const GridItemDetails(this.item);
+  final String name;
+
+  const GridItemDetails(this.item,this.name);
   @override
   Widget build(BuildContext context) {
     String image = item.image;
@@ -25,7 +28,7 @@ class GridItemDetails extends StatelessWidget {
               Container(
                   height: 300,
                   width: double.infinity,
-                  child: Image.network(image, fit: BoxFit.cover)),
+                  child: Image.network(image, fit: BoxFit.fitWidth)),
               Container(
                 margin: EdgeInsets.fromLTRB(16.0, 250.0, 16.0, 16.0),
                 decoration: BoxDecoration(
@@ -36,7 +39,7 @@ class GridItemDetails extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      item.title,
+                      item.title.replaceAll(new RegExp(r'zanaku'), name),
                       style: Theme.of(context).textTheme.display1,
                     ),
                     SizedBox(height: 10.0),
@@ -46,7 +49,7 @@ class GridItemDetails extends StatelessWidget {
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text(item.description,
+                    Text(item.description.replaceAll(new RegExp(r'zanaku'), name),
                         style: Theme.of(context).textTheme.body1),
                     SizedBox(height: 10.0),
                   ],
@@ -58,12 +61,21 @@ class GridItemDetails extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print(item.id);
+          _launchURL(item.id);
         },
         backgroundColor: Colors.red,
         tooltip: 'Aller vers le lien',
         child: Icon(Icons.navigate_next),
       ),
     );
+  }
+}
+
+_launchURL(id) async {
+  var url = 'https://www.fiainanabediabe.org/teny/api/$id';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }
