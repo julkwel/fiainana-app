@@ -225,8 +225,9 @@ class PhotosListState extends State<PhotosList> {
   Widget _buildListItem(photos) {
     var text = photos.description.replaceAll(new RegExp(r'zanaku'), username);
     return Container(
-        height: 100,
-        child: Card(
+        height: 150,
+        child: Padding(
+          child: Card(
             elevation: 2.0,
             child: InkWell(
               onTap: () {
@@ -250,12 +251,13 @@ class PhotosListState extends State<PhotosList> {
                   ),
                   subtitle: Text(
                     text.replaceAll(new RegExp('\\*'), ' '),
-                    maxLines: 2,
+                    maxLines: 4,
                     style: Theme.of(context).textTheme.body1,
                   ),
                 ),
               ),
-            )));
+            )), padding: const EdgeInsets.all(0.2),),
+        );
   }
 
   _save(photo) async {

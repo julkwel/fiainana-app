@@ -44,10 +44,11 @@ class _MyCustomFormState extends State<Register> {
         padding: const EdgeInsets.all(16.0),
         child: TextField(
           decoration: InputDecoration(
-              border: InputBorder.none, hintText: 'Ampidiro ny anaranao'),
+              border: InputBorder.none, hintText: 'Anarana fiantsoana'),
           controller: myController,
         ),
       ),
+      
       floatingActionButton: FloatingActionButton(
         // When the user presses the button, show an alert dialog with the
         // text the user has typed into our text field.
