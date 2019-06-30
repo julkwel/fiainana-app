@@ -1,33 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gridview_app/model/Item.dart';
-import 'package:flutter_gridview_app/model/database_helpers.dart';
 import 'package:flutter_gridview_app/screen/GridItemDetails.dart';
+import 'package:flutter_gridview_app/screen/HomeScreen.dart';
 import 'package:flutter_gridview_app/screen/register.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_gridview_app/screen/TenyAnio.dart';
 
 Future<List<Photo>> fetchPhotos(http.Client client) async {
-  try {
-    final result = await InternetAddress.lookup('google.com');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      final response = await client.get('https://www.fiainanabediabe.org/teny/api/');
-      // Use the compute function to run parsePhotos in a separate isolate
-      return compute(parsePhotos, response.body);
-    }
-  } on SocketException catch (_) {
-    final DatabaseHelper db = DatabaseHelper.instance;
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
-    return db.photos();
-  }
-  final DatabaseHelper db = DatabaseHelper.instance;
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
-    return db.photos();
+  final response = await client.get('https://www.fiainanabediabe.org/jour');
+
+  // Use the compute function to run parsePhotos in a separate isolate
+  return compute(parsePhotos, response.body);
 }
 
 // A function that converts a response body into a List<Photo>
@@ -37,40 +24,28 @@ List<Photo> parsePhotos(String responseBody) {
   return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
 }
 
-Future<List<Photo>> fetchPost(http.Client client) async {
-  final response = await client.get('https://www.fiainanabediabe.org/jour');
-
-  if (response.statusCode == 200) {
-    // If server returns an OK response, parse the JSON.
-    return compute(parsePhotos, response.body);
-  } else {
-    // If that response was not OK, throw an error.
-    throw Exception('Failed to load post');
-  }
-}
-
-class HomePage extends StatefulWidget {
+class TenyAnio extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return new HomePageState();
+    return new TenyAnioState();
   }
 }
 
-class HomePageState extends State<HomePage> {
+class TenyAnioState extends State<TenyAnio> {
   var appTitle = 'FIAINANA BDB';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(title: appTitle),
+      home: TenyAnioScreen(title: appTitle),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class TenyAnioScreen extends StatelessWidget {
   final String title;
-  HomeScreen({Key key, this.title}) : super(key: key);
+  TenyAnioScreen({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -104,16 +79,15 @@ class HomeScreen extends StatelessWidget {
                 child: new Icon(Icons.book),
               ),
               title: Text(
-                'Tenin\'Andriamanitra anio',
+                'Hiverina',
                 style: TextStyle(color: Colors.blue),
               ),
               onTap: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TenyAnio(),
-                  ),
-                );
+                      context,
+                      MaterialPageRoute<HomePage>(
+                          builder: (BuildContext context) => HomePage()),
+                    );
               },
             ),
           ],
@@ -156,7 +130,7 @@ Widget _buildHeaderDrawer() {
 class PhotosList extends StatefulWidget {
   final List<Photo> photos;
   PhotosList({Key key, this.photos}) : super(key: key);
-
+  
   @override
   State<StatefulWidget> createState() {
     return new PhotosListState(photos);
@@ -212,7 +186,6 @@ class PhotosListState extends State<PhotosList> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-              _save(photos[index]);
               return _buildListItem(photos[index]);
             },
             childCount: photos.length,
@@ -233,7 +206,7 @@ class PhotosListState extends State<PhotosList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => GridItemDetails(photos, username)),
+                      builder: (context) => GridItemDetails(photos,username)),
                 );
               },
               child: Center(
@@ -246,7 +219,9 @@ class PhotosListState extends State<PhotosList> {
                     photos.title.replaceAll(new RegExp(r'zanaku'), username),
                     softWrap: true,
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.blue),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue
+                    ),
                   ),
                   subtitle: Text(
                     text.replaceAll(new RegExp('\\*'), ' '),
@@ -256,18 +231,5 @@ class PhotosListState extends State<PhotosList> {
                 ),
               ),
             )));
-  }
-
-  _save(photo) async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        DatabaseHelper helper = DatabaseHelper.instance;
-        int id = await helper.insert(photo);
-        print('inserted row: $id');
-      }
-    } on SocketException catch (_) {
-      print('not connected');
-    }
   }
 }
